@@ -1,0 +1,40 @@
+import RedisService from "./services/RedisService.js"
+import { leaveAllRooms } from "./socket/helper.js"
+import { conversationRequest, notifyConversationOnlineStatus } from "./socket/socketConversation.js"
+
+
+export const initializeSocket = async (io) => {
+    io.on('connection', async (socket) => {
+        try {
+            const user = socket.user
+            console.log('User connected', user.id)
+            socket.join(user._id.toString())
+
+            await RedisService.addUserSession(user.id, socket.id)
+
+            await notifyConversationOnlineStatus(io, socket, true)
+
+            socket.on('conversation:request', (data) => {
+                conversationRequest(io, socket, data)
+            })
+
+            socket.on('disconnect', async () => {
+
+                await RedisService.removeUserSession(user.id, socket.id)
+
+                const isOnline = await RedisService.isUserOnline(user.id)
+
+                if(!isOnline) {
+                    await notifyConversationOnlineStatus(io, socket, false)
+                    leaveAllRooms(socket)
+                }
+
+            })
+            
+        } catch (error) {
+            console.error('Socket connection error: ', error)
+            socket.emit('Internal Error: ', {error: 'Internal server error'})
+        }
+
+    })
+}
