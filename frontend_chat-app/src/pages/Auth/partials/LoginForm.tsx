@@ -21,12 +21,12 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
     const navigate = useNavigate();
-    const { setUser } = useAuthStore();
+    const {setUser} = useAuthStore();
 
     const { 
         register, 
         handleSubmit, 
-        formState: { errors }
+        formState: {errors}
     } = useForm({
         resolver: zodResolver(loginSchema)
     })
@@ -34,14 +34,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
     const mutation = useMutation({
         mutationFn: authService.login,
         onSuccess: (data) => {
-            const { user } =  data;
-            setUser(user);
+            const { user } =  data
+            setUser(user)
             toast.success("Login successfull!")
-            return navigate('/');
+            return navigate('/')
         },
         onError: (error) => {
             const msg = error.response?.data?.message || "Login failed"
-            toast.error(msg);
+            toast.error(msg)
         }
     })
 
@@ -96,4 +96,4 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
     </>
 }
 
-export default LoginForm;
+export default LoginForm

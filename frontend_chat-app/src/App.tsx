@@ -8,13 +8,13 @@ const App: React.FC = () => {
   return (
     <>
       <Routes>
-
-        <Route element={<PrivateRoute /> }>
-          <Route path='/' element={<Chat />}></Route>
+        
+        <Route element={<PrivateRoute />}>
+          <Route path="/" element={<Chat />}/>
         </Route>
 
         <Route element={<GuestRoute />}>
-          <Route path='/auth' element={<Auth />}></Route>
+          <Route path="/auth" element={<Auth />}/>
         </Route>
 
       </Routes>

@@ -30,7 +30,9 @@ type RegisterFormData = z.infer<typeof registerSchema>
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitch }) => {
     const {
-        register, handleSubmit, formState: { errors }
+        register, 
+        handleSubmit, 
+        formState: {errors}
     } = useForm({
         resolver: zodResolver(registerSchema)
     })

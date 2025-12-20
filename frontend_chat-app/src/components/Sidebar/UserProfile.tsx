@@ -3,25 +3,25 @@ import { useAuthStore } from "../../stores/authStore"
 import { useQueryClient } from "@tanstack/react-query"
 import { authService } from "../../services/authService"
 import { useNavigate } from "react-router"
-// import { useConversationStore } from "../../stores/conversationStore"
+import { useConversationStore } from "../../stores/conversationStore"
 
 const UserProfile: React.FC = () => {
     const { user, logout } = useAuthStore()
     const navigate = useNavigate()
-    // const {selectedConversation, setSelectedConversation} = useConversationStore()
+    const {selectedConversation, setSelectedConversation} = useConversationStore()
 
-    const queryClient = useQueryClient();
+    const queryClient = useQueryClient()
 
     const logoutUser = async () => {
-        await authService.logout();
-        logout();
-        await queryClient.removeQueries();
+        await authService.logout()
+        logout()
+        queryClient.removeQueries()
 
-        // if (selectedConversation) {
-        //     setSelectedConversation(null);
-        // }
+        if (selectedConversation) {
+            setSelectedConversation(null)
+        }
 
-        return navigate('/auth');
+        return navigate('/auth')
     }
 
     return <div className="p-4 border-t border-gray-200 flex items-center space-x-3">
@@ -31,7 +31,7 @@ const UserProfile: React.FC = () => {
             <p className="text-xs text-gray-500">Online</p>
         </div>
         <button onClick={() => logoutUser()} className="text-gray-500 hover:text-gray-700 cursor-pointer">
-            <LogOut className="size-[16px]"/>
+            <LogOut className="size-4"/>
         </button>
     </div>
 }

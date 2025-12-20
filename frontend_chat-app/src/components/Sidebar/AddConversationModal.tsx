@@ -5,9 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { Loader2, Wifi } from "lucide-react"
 import { conversationService } from "../../services/conversationService"
-import { useSocketContext } from "../../contexts/SocketContext"
-import Modal from '../ui/Modal'
-import { useQuery } from "@tanstack/react-query"
+import { useSocketContext } from "../../contexts/SocketContext";
+import Modal from '../ui/Modal';
+import { useQuery } from "@tanstack/react-query";
 
 const addConversationSchema = z.object({
     connectCode: z.string().min(6, {message: "Invalid connect ID"})
@@ -39,22 +39,22 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
     const connectCode = watch('connectCode')
 
     const {isFetching, refetch} = useQuery({
-        queryKey: ['checkConnectCode', connectCode],
+        queryKey: ["checkConnectCode", connectCode],
         queryFn: () => conversationService.checkConnectCode(connectCode),
         enabled: false,
         retry: false
     })
 
     const onSubmit = async (formData: AddConversationFormData) => {
-        const result = await refetch();
+        const result = await refetch()
 
         if (result?.data?.success) {
             socket?.emit('conversation:request', {
-                connectCode: formData.connectCode,
+                connectCode: formData.connectCode
             })
-            onClose();
+            onClose()
         } else {
-            toast.error(result.error?.response?.data.message ?? "Invalid connect ID");
+            toast.error(result.error?.response?.data.message ?? "Invalid connect ID")
         }
     }
 
@@ -63,7 +63,7 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
     }, [isOpen, reset])
 
     return <>
-            <Modal
+        <Modal
             isOpen={isOpen}
             onClose={onClose}
             title="Add Conversation"
@@ -87,7 +87,7 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
                 </button>
             </form>
         </Modal>
-        </>
+    </>
 }
 
 export default AddConversationModal

@@ -8,4 +8,4 @@ const ChatPlaceholder: React.FC = () => {
     </div>
 }
 
-export default ChatPlaceholder;
+export default ChatPlaceholder

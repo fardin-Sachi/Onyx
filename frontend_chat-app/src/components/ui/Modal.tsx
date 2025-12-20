@@ -6,7 +6,7 @@ interface ModalProps {
     title?: string
     children: React.ReactNode
     footer?: React.ReactNode
-    size?: 'sm' | 'md' | 'lg'
+    size?: "sm" | "md" | "lg"
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -15,18 +15,17 @@ const Modal: React.FC<ModalProps> = ({
     title,
     children,
     footer,
-    size='md'
+    size = 'md',
 }) => {
     if(!isOpen) return null
 
     const sizeClass = {
-        sm: 'max-w-sm',
-        md: 'max-w-md',
-        lg: 'max-w-lg',
+        sm: "max-w-sm",
+        md: "max-w-md",
+        lg: "max-w-lg",
     }
 
-    return 
-    <>
+    return <>
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
             <div
                  className={`

@@ -77,7 +77,7 @@ async function seed() {
         console.log(`Conversation created ${conversation.id}`);
 
         const messages = [];
-        for (let i = 0; i < 30; i++) {
+        for(let i=0; i<30; i++) {
             const sender = i % 2 === 0 ? user1 : user2;
             const content = `Message ${i + 1} from ${sender.username}`;
             const message = await Message.create({

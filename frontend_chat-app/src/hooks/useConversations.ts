@@ -5,6 +5,6 @@ export function useConversations() {
     return useQuery({
         queryKey: ['conversations'],
         queryFn: conversationService.fetchConversations,
-        retry: false
+        retry: false,
     })
 }

@@ -12,7 +12,7 @@ const SocketContext = createContext<SocketContextType>({socket: null})
 
 export const useSocketContext = () => {
     const context = useContext(SocketContext)
-    if(!context) throw new Error('useSocketContext must be used within a SocketProvider')
+    if (!context) throw new Error("useSocketContext must be used within a SocketProvider")
 
     return context
 }
@@ -22,26 +22,27 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     const [socket, setSocket] = useState<Socket | null>(null)
 
     useEffect(() => {
-        if(!user) return
+        if (!user) return
 
         const socketClient = io(import.meta.env.VITE_API_URL.replace('/api', ''), {
             withCredentials: true,
             reconnectionAttempts: 1
         })
+
         setSocket(socketClient)
 
-        socketClient.on('connect', () => {
-            console.log('Socket connected', socketClient.id)
+        socketClient.on("connect", () => {
+            console.log("Socket connected", socketClient.id)
         })
 
-        socketClient.on('connect_error', (error) => {
-            console.error('Connection error: ',error)
-            toast.error('Socket connection error')
+        socketClient.on("connect_error", (error) => {
+            console.error("Connection error", error)
+            toast.error("Socket connection error")
         })
 
-        socketClient.on('internal_error', (error) => {
-            console.error('Connection error: ',error)
-            toast.error('Socket connection error')
+        socketClient.on("internal_error", (error) => {
+            console.error("Connection error", error)
+            toast.error("Socket connection error")
         })
 
         return () => {
@@ -53,5 +54,4 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     return <SocketContext.Provider value={{socket}}>
         {children}
     </SocketContext.Provider>
-
 }
