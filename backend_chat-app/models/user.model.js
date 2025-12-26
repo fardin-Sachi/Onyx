@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
         unique: true,
         index: true
     },
-
     fullName: {
         type: String,
         required: true,
@@ -26,8 +25,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        lowercase: true,
-        trim: true
+        trim: true,
+        lowercase: true
     },
     password: {
         type: String,

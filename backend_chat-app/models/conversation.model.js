@@ -23,14 +23,11 @@ const conversationSchema = new mongoose.Schema({
 
 conversationSchema.index({"participants.0": 1, "participants.1": 1}, {unique: true})
 
-conversationSchema.pre("save", function () {
-    if (this.participants && this.participants.length === 2) {
-        this.participants = this.participants
-                                .map(p => p.toString())
-                                .sort();
+conversationSchema.pre("save", function (next) {
+    if(this.participants && this.participants.length === 2) {
+        this.participants = this.participants.map(p => p.toString()).sort()
     }
 
-    // next();
 })
 
-export default mongoose.model("Conversation", conversationSchema);
+export default mongoose.model("Conversation", conversationSchema)

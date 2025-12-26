@@ -1,68 +1,58 @@
-import dotenv from 'dotenv'
-import express from 'express'
-import cookieParser from 'cookie-parser'
-import cors from 'cors'
-import http from 'http'
-import { connectDB } from './utils/db.js'
-import authRoute from './routes/auth.route.js'
-import conversationRoute from './routes/conversation.route.js'
-import { Server } from 'socket.io'
-import { initializeSocket } from './socket.js'
-import { socketAuthMiddleware } from './socket/socketAuth.middleware.js'
-import RedisService from './services/RedisService.js'
-import messageRoutes from './routes/message.route.js'
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+import http from "http"
+import { Server } from "socket.io"
+import { connectDB } from "./utils/db.js"
+import authRoutes from "./routes/auth.route.js"
+import conversationRoutes from "./routes/conversation.route.js"
+import messageRoutes from "./routes/message.route.js"
+import { initializeSocket } from "./socket.js"
+import { socketAuthMiddleware } from "./socket/socketAuth.middleware.js"
+import RedisService from "./services/RedisService.js"
+import envConfig from "./config/env.config.js"
 
-
-dotenv.config()
 
 const app = express()
 const httpServer = http.createServer(app)
 
-
-/// Middlewares
+// Middlewares
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN,
-    credentials: true,
+    origin: envConfig.CLIENT_ORIGIN,
+    credentials: true
 }))
-
 app.use(cookieParser())
 
 app.use(express.json())
 
-
-///Routes
-app.use('/api/auth', authRoute)
-app.use('/api/conversations', conversationRoute)
+// routes
+app.use('/api/auth', authRoutes)
+app.use('/api/conversations', conversationRoutes)
 app.use('/api/conversations', messageRoutes)
 
-///Socket.io setup
 const io = new Server(httpServer, {
     cors: {
-        origin: process.env.CLIENT_ORIGIN,
+        origin: envConfig.CLIENT_ORIGIN,
         credentials: true,
         methods: ["GET", "POST"]
     },
     pingInterval: 25000,
-    pingTimeout: 60000
+    pingTimeout: 60000,
 })
-
 io.use(socketAuthMiddleware)
 
 await initializeSocket(io)
 
-// Redis setup
 await RedisService.initialize()
 
-
-// DB and Server connection
 try {
     await connectDB()
-    const PORT = process.env.PORT || 4000
-    httpServer.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`)
-    })
 
+    const PORT = envConfig.PORT || 4000
+    httpServer.listen(PORT, () => {
+        console.log(`Server running on port: ${PORT}`)
+    })
 } catch (error) {
-    console.error("Server failed to start. Error: ", error)
+    console.error("The server failed to start", error)
     process.exit(1)
 }

@@ -1,17 +1,14 @@
-import Message from '../models/message.model.js'
-
+import Message from "../models/message.model.js"
 
 class MessageController {
     static async getMessages(req, res) {
         try {
-
-            const {conversationId} = req.params
-            const {cursor} = req.query
+            const { conversationId } = req.params
+            const { cursor } = req.query
             const limit = 20
 
             const query = {conversation: conversationId}
-
-            if(cursor){
+            if(cursor) {
                 query.createdAt = {$lt: new Date(cursor)}
             }
 
@@ -20,11 +17,10 @@ class MessageController {
                 .limit(limit)
                 .populate("sender", "username")
                 .lean()
-            
-            const nextCursor = messages.length > 0 ? messages[messages.length-1].createdAt.toISOString()
-            : null
 
-            messages.reverse()
+            const nextCursor = messages.length > 0 ? messages[messages.length - 1].createdAt.toISOString() : null
+
+            messages = messages.reverse()
 
             res.json({
                 messages,

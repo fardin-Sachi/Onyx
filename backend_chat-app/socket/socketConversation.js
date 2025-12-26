@@ -14,17 +14,17 @@ export const notifyConversationOnlineStatus = async (io, socket, online) => {
             $or: [
                 {requester: userId},
                 {recipient: userId}
-            ]
+            ],
         })
 
         friendships.forEach((friendship) => {
-            const isRequester = friendship.requester._id.toString() == userId.toString()
+            const isRequester = friendship.requester._id.toString() === userId.toString()
             const friendId = isRequester ? friendship.recipient._id : friendship.requester._id
 
             const room = getChatRoom(userId.toString(), friendId.toString())
             socket.join(room)
 
-            console.log('emit:conversation:online-status')
+            console.log("emit:conversation:online-status")
             io.to(friendId.toString())
                 .emit('conversation:online-status', {
                     friendId: userId,
@@ -33,9 +33,8 @@ export const notifyConversationOnlineStatus = async (io, socket, online) => {
                 })
         })
 
-        
     } catch (error) {
-        console.error('notifyConversationOnlineStatus', error)
+        console.error("notifyConversationOnlineStatus", error)
     }
 }
 
@@ -43,16 +42,15 @@ export const conversationRequest = async (io, socket, data) => {
     try {
         const userId = socket.userId
         const user = socket.user
-        const {connectcode} = data
+        const { connectCode } = data
 
-        const friend = await User.findOne({connectCode})
-        if(!friend){
-            socket.emit('conversaion:request:error', {error: "Unable to find conversation"})
+        const friend = await User.findOne({ connectCode })
+        if(!friend) {
+            socket.emit("conversation:request:error", {error: "Unable to find conversation"})
             return
         }
-
         if(friend._id.toString() === userId.toString()) {
-            socket.emit('conversaion:request:error', {error: "Cannot add yourself as friend"})
+            socket.emit("conversation:request:error", {error: "Can not add yourself as a friend"})
             return
         }
 
@@ -60,10 +58,10 @@ export const conversationRequest = async (io, socket, data) => {
             $or: [
                 {requester: userId, recipient: friend._id},
                 {requester: friend._id, recipient: userId}
-            ]
+            ],
         })
         if(existingFriendship) {
-            socket.emit('conversaion:request:error', {error: "Friendship already exists"})
+            socket.emit("conversation:request:error", {error: "Friendship already exists"})
             return
         }
 
@@ -71,9 +69,9 @@ export const conversationRequest = async (io, socket, data) => {
             requester: userId,
             recipient: friend._id
         })
-
+        
         const conversation = await Conversation.create({
-            participant: [userId, friend._id.toString()]
+            participants: [userId, friend._id.toString()]
         })
 
         socket.join(getChatRoom(userId, friend._id.toString()))
@@ -84,10 +82,10 @@ export const conversationRequest = async (io, socket, data) => {
             unreadCounts: {
                 [userId.toString()]: 0,
                 [friend._id.toString()]: 0
-            }
+            },
         }
 
-        io.to(userId.toString().emit('conversation:accept', {
+        io.to(userId.toString()).emit('conversation:accept', {
             ...conversationData,
             friend: {
                 id: friend.id,
@@ -96,9 +94,9 @@ export const conversationRequest = async (io, socket, data) => {
                 connectCode: friend.connectCode,
                 online: await RedisService.isUserOnline(friend._id.toString())
             }
-        }))
+        })
 
-        io.to(friend._id.toString().emit('conversation:accept', {
+        io.to(friend._id.toString()).emit('conversation:accept', {
             ...conversationData,
             friend: {
                 id: user.id,
@@ -107,11 +105,11 @@ export const conversationRequest = async (io, socket, data) => {
                 connectCode: user.connectCode,
                 online: await RedisService.isUserOnline(user._id.toString())
             }
-        }))
-        
+        })
+
     } catch (error) {
-        console.error("Error conversation:request",error)
-        socket.emit('conversation:request:error',{error: "Error conversation:request"})
+        console.error("Error conversation:request", error)
+        socket.emit("conversation:request:error", {error: "Error conversation:request"})
     }
 }
 
@@ -124,18 +122,19 @@ export const conversationMarkAsRead = async (io, socket, data) => {
             $or: [
                 {requester: userId, recipient: friendId},
                 {requester: friendId, recipient: userId}
-            ]
+            ],
         })
-        if(!friendship){
-            socket.emit('conversation:mark-as-read:error', {error: 'No friendship found'})
+
+        if(!friendship) {
+            socket.emit("conversation:mark-as-read:error", {error: "No friendship found"})
             return
         }
 
         const conversation = await Conversation.findById(conversationId)
-        if(!conversation){
-            socket.emit('conversation:mark-as-read:error', {error: 'No conversation found'})
+        if(!conversation) {
+            socket.emit("conversation:mark-as-read:error", {error: "No conversation found"})
             return
-        }
+        }        
 
         conversation.unreadCounts.set(userId.toString(), 0)
         await conversation.save()
@@ -149,36 +148,35 @@ export const conversationMarkAsRead = async (io, socket, data) => {
             }
         })
 
-        // socket.emit('conversation:mark-as-read', {error: 'Error: conversation:mark-as-read:error'})
-
     } catch (error) {
-        console.error('Error marking conversation as read: ', error)
-        socket.emit('conversation:mark-as-read', {error: 'Error: conversation:mark-as-read:error'})
+        console.error("Error marking conversation as read", error)
+        socket.emit("conversation:mark-as-read:error", {error: "Error: conversation:mark-as-read:error"})
     }
 }
 
 export const conversationSendMessage = async (io, socket, data) => {
     try {
-        const {conversationId, friendId, content} = data
+        const { conversationId, friendId, content } = data
         const userId = socket.userId
         const user = socket.user
 
-        const friendship = await Friendship.findOne({
+                const friendship = await Friendship.findOne({
             $or: [
                 {requester: userId, recipient: friendId},
                 {requester: friendId, recipient: userId}
-            ]
+            ],
         })
-        if(!friendship){
-            socket.emit('conversation:send-message:error', {error: 'No friendship found'})
+
+        if(!friendship) {
+            socket.emit("conversation:send-message:error", {error: "No friendship found"})
             return
         }
 
         const conversation = await Conversation.findById(conversationId)
-        if(!conversation){
-            socket.emit('conversation:send-message:error', {error: 'No conversation found'})
+        if(!conversation) {
+            socket.emit("conversation:send-message:error", {error: "No conversation found"})
             return
-        }
+        }  
 
         const message = new Message({
             conversation: conversation.id,
@@ -189,13 +187,13 @@ export const conversationSendMessage = async (io, socket, data) => {
 
         const currentUnreadCount = conversation.unreadCounts.get(friendId) || 0
         conversation.unreadCounts.set(friendId, currentUnreadCount + 1)
-        await conversation.save()
-
+        await conversation.save()  
+        
         const messageData = {
             _id: message.id,
             sender: {
                 _id: userId.toString(),
-                username: user.username                
+                username: user.username,
             },
             content,
             createdAt: message.createdAt,
@@ -205,23 +203,24 @@ export const conversationSendMessage = async (io, socket, data) => {
         const updatedConversation = await Conversation.findById(conversationId)
 
         const room = getChatRoom(userId, friendId)
+
         io.to(room).emit("conversation:new-message", {
             conversationId: conversation.id,
             message: messageData
         })
 
-        io.to(room).emit('conversation:update-conversation', {
-            conversationId: updatedConversation.id,
+        io.to(room).emit("conversation:update-conversation", {
+            conversationId: conversation.id,
             lastMessage: updatedConversation.lastMessagePreview,
             unreadCounts: {
                 [userId.toString()]: updatedConversation.unreadCounts.get(userId.toString()),
                 [friendId]: updatedConversation.unreadCounts.get(friendId)
             }
-        })
+        })        
 
     } catch (error) {
-        console.error('Error sending message: ', error)
-        socket.emit('conversation:send-message:error', {error: 'Error: conversation:send-message:error'})
+        console.error("Error sending message", error)
+        socket.emit("conversation:send-message:error", {error: "Error: conversation:send-message:error"})
     }
 }
 
@@ -232,12 +231,12 @@ export const conversationTyping = async (io, socket, data) => {
 
         if(userId.toString() === friendId) return
 
-        socket.to(friendId).emit('conversation:typing', {
+        socket.to(friendId).emit("conversation:update-typing", {
             userId: userId.toString(),
             isTyping
         })
-        
+
     } catch (error) {
-        console.error('Error sending conversation typing state: ',error);
+        console.error("Error sending conversation typing state", error)
     }
 }

@@ -4,6 +4,7 @@ import MessageController from '../controllers/message.controller.js'
 
 const router = express.Router()
 
-router.get('/:conversationId/messages', authMiddleware, MessageController.getMessages)
+
+router.get("/:conversationId/messages", authMiddleware, MessageController.getMessages)
 
 export default router

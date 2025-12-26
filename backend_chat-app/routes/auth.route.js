@@ -4,13 +4,14 @@ import authMiddleware from "../middlewares/auth.middleware.js"
 
 const router = express.Router()
 
-router.post('/register', AuthController.register)
 
-router.post('/login', AuthController.login)
+router.post("/register", AuthController.register)
 
-router.post('/logout', authMiddleware, AuthController.logout)
+router.post("/login", AuthController.login)
 
-router.get('/me', authMiddleware, AuthController.me)
+router.post("/logout", authMiddleware, AuthController.logout)
+
+router.get("/me", authMiddleware, AuthController.me)
 
 
 export default router
