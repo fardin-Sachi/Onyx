@@ -7,9 +7,14 @@ import { useMutation } from "@tanstack/react-query"
 import { authService } from "../../../services/authService"
 import { toast } from "sonner"
 import { Loader2, Lock, Mail } from "lucide-react"
+import type { AxiosError } from "axios"
 
 interface LoginFormProps {
     onSwitch: () => void
+}
+
+interface ApiError {
+    message: string
 }
 
 const loginSchema = z.object({
@@ -40,7 +45,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
             return navigate('/')
         },
         onError: (error) => {
-            const msg = error.response?.data?.message || "Login failed"
+            const axiosError = error as AxiosError<ApiError>
+            const msg = axiosError.response?.data?.message || "Login failed"
             toast.error(msg)
         }
     })

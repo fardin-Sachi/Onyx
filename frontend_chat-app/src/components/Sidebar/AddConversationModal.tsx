@@ -8,6 +8,7 @@ import { conversationService } from "../../services/conversationService"
 import { useSocketContext } from "../../contexts/SocketContext";
 import Modal from '../ui/Modal';
 import { useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios"
 
 const addConversationSchema = z.object({
     connectCode: z.string().min(6, {message: "Invalid connect ID"})
@@ -18,6 +19,10 @@ type AddConversationFormData = z.infer<typeof addConversationSchema>
 interface AddConversationModalProps {
     isOpen: boolean
     onClose: () => void
+}
+
+interface ApiError {
+  message: string
 }
 
 const AddConversationModal: React.FC<AddConversationModalProps> = ({
@@ -54,7 +59,10 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
             })
             onClose()
         } else {
-            toast.error(result.error?.response?.data.message ?? "Invalid connect ID")
+            const error = result.error as AxiosError<ApiError>
+
+            toast.error(error.response?.data?.message ?? "Invalid connect ID")
+
         }
     }
 
