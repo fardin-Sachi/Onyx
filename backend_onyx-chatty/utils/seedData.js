@@ -5,9 +5,6 @@ import Friendship from "../models/friendship.model.js"
 import Conversation from "../models/conversation.model.js"
 import Message from "../models/message.model.js"
 import { connectDB } from './db.js'
-import dotenv from "dotenv"
-
-dotenv.config()
 
 async function resetDatabase() {
     try {
