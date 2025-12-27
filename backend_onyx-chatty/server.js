@@ -30,7 +30,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/conversations', conversationRoutes)
 app.use('/api/conversations', messageRoutes)
     // Health Check
-app.get('api/health', (req,res) => {
+app.get('/api/health', (req,res) => {
     res.status(200).json({
         success: true, 
         data: {
