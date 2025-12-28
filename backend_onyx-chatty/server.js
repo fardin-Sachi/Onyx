@@ -26,6 +26,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 // routes
+app.set("trust proxy", 1)
 app.use('/api/auth', authRoutes)
 app.use('/api/conversations', conversationRoutes)
 app.use('/api/conversations', messageRoutes)

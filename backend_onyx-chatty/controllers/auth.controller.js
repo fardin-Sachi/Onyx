@@ -68,7 +68,7 @@ class AuthController {
             res.cookie("jwt", token, {
                 maxAge: 7 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'none',
                 secure: envConfig.NODE_ENV !== "development"
             })
 
@@ -112,7 +112,12 @@ class AuthController {
     }
 
     static async logout(req, res) {
-        res.cookie("jwt", "", {maxAge: 0})
+        res.cookie("jwt", "", {
+            maxAge: 0,
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+        })
         res.json({message: "Logged out successfully!"})
     }
 }
